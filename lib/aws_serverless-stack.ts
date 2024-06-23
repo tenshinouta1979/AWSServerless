@@ -30,16 +30,17 @@ export class AwsServerlessStack extends cdk.Stack {
     // Subscribe Lambda function to the topic
     usageTopic.addSubscription(new subscriptions.LambdaSubscription(usageFunction));
 
-    // Create SES email address
-    const emailAddress = 'ryan_lee@live.com'; // Replace with your verified email
-
     // Grant permissions to Lambda function
     usageFunction.addToRolePolicy(new iam.PolicyStatement({
       actions: ['ses:SendEmail'],
       resources: ['*'], // Adjust permissions as needed
     }));
 
+    // Create SES email address
+    //const emailAddress = 'ryan_lee@live.com'; // Replace with your verified email
     // Send an email from Lambda
-    usageFunction.addEnvironment('RECIPIENT_EMAIL', emailAddress);
+    //usageFunction.addEnvironment('RECIPIENT_EMAIL', emailAddress);
+
+    emailAddressParameter.grantRead(usageFunction);
   }
 }
