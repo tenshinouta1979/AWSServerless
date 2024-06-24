@@ -6,6 +6,8 @@ import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as ses from 'aws-cdk-lib/aws-ses';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 export class AwsServerlessStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -35,6 +37,14 @@ export class AwsServerlessStack extends cdk.Stack {
       actions: ['ses:SendEmail'],
       resources: ['*'], // Adjust permissions as needed
     }));
+
+    // Create a CloudWatch Events rule to trigger every week
+    const rule = new events.Rule(this, 'Rule', {
+      schedule: events.Schedule.cron({ minute: '0', hour: '12', weekDay: 'MON' }),
+    });
+
+    // Add the SNS topic as a target of the rule
+    rule.addTarget(new targets.SnsTopic(usageTopic));
 
     // Create SES email address
     //const emailAddress = 'ryan_lee@live.com'; // Replace with your verified email
